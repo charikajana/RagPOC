@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # ─────────────────────────────────────────────
+  # ChromaDB — Local Vector Database
+  # ─────────────────────────────────────────────
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: rag-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+      - ANONYMIZED_TELEMETRY=FALSE
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────────────
+  # RAG Engine API
+  # ─────────────────────────────────────────────
+  rag-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rag-engine
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - CHROMA_URL=http://chromadb:8000
+      - NODE_ENV=production
+    depends_on:
+      chromadb:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./knowledge:/app/knowledge:ro
+
+volumes:
+  chroma_data:
+    driver: local

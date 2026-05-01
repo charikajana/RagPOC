@@ -1,0 +1,54 @@
+{
+  "name": "rag-engine",
+  "version": "1.0.0",
+  "description": "RAG Engine for AI-Driven Test Automation from Azure DevOps",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "ingest:ado": "ts-node src/scripts/ingestADO.ts",
+    "ingest:features": "ts-node src/scripts/ingestFeatures.ts",
+    "ingest:docs": "ts-node src/scripts/ingestDocs.ts"
+  },
+  "keywords": [
+    "rag",
+    "langchain",
+    "anthropic",
+    "claude",
+    "ollama",
+    "azure-devops",
+    "test-automation",
+    "cucumber"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/anthropic": "^0.3.34",
+    "@langchain/community": "^0.3.0",
+    "@langchain/core": "^0.3.0",
+    "@langchain/ollama": "^0.1.0",
+    "axios": "^1.7.2",
+    "chromadb": "^1.9.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "glob": "^11.0.0",
+    "langchain": "^0.3.0",
+    "multer": "^2.0.0",
+    "pdf-parse": "^1.1.1",
+    "uuid": "^11.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.14.9",
+    "@types/pdf-parse": "^1.1.4",
+    "@types/uuid": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.3"
+  }
+}
