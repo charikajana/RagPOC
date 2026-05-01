@@ -9,7 +9,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "ingest:ado": "ts-node src/scripts/ingestADO.ts",
     "ingest:features": "ts-node src/scripts/ingestFeatures.ts",
-    "ingest:docs": "ts-node src/scripts/ingestDocs.ts"
+    "ingest:docs": "ts-node src/scripts/ingestDocs.ts",
+    "ingest:repo": "ts-node src/scripts/ingestRepo.ts"
   },
   "keywords": [
     "rag",
