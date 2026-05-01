@@ -2,15 +2,37 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // ─────────────────────────────────────────────
+// LLM PROVIDER SELECTOR
+// Options: 'github' | 'anthropic' | 'azure'
+// Set LLM_PROVIDER=github to use GitHub Models
+// (same GPT-4o that Copilot uses — FREE with your Copilot subscription)
+// ─────────────────────────────────────────────
+export const LLM_PROVIDER = process.env.LLM_PROVIDER || 'anthropic';
+
+// ─────────────────────────────────────────────
+// GITHUB MODELS (Copilot — no extra cost!)
+// Uses your GitHub Personal Access Token
+// Get one: https://github.com/settings/tokens
+// Scopes needed: (none — any classic PAT works)
+// Models: gpt-4o | gpt-4o-mini | phi-3-medium
+// ─────────────────────────────────────────────
+export const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+export const GITHUB_MODEL = process.env.GITHUB_MODEL || 'gpt-4o';
+
+// ─────────────────────────────────────────────
 // ANTHROPIC (Claude API)
 // ─────────────────────────────────────────────
 export const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
+export const ANTHROPIC_MODEL   = process.env.ANTHROPIC_MODEL   || 'claude-3-5-haiku-20241022';
 
-// Model options:
-//   claude-3-5-haiku-20241022   ← fastest, cheapest  (~$0.001 per test gen)
-//   claude-3-5-sonnet-20241022  ← best quality
-//   claude-3-opus-20240229      ← most powerful
-export const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-3-5-haiku-20241022';
+// ─────────────────────────────────────────────
+// AZURE OPENAI
+// ─────────────────────────────────────────────
+export const AZURE_OPENAI_API_KEY            = process.env.AZURE_OPENAI_API_KEY            || '';
+export const AZURE_OPENAI_ENDPOINT           = process.env.AZURE_OPENAI_ENDPOINT           || '';
+export const AZURE_OPENAI_CHAT_DEPLOYMENT    = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT    || 'gpt-4o';
+export const AZURE_OPENAI_EMBEDDING_DEPLOYMENT = process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT || '';
+export const AZURE_OPENAI_API_VERSION        = process.env.AZURE_OPENAI_API_VERSION        || '2024-02-01';
 
 // ─────────────────────────────────────────────
 // OLLAMA (Local Embeddings — FREE, no API key)
@@ -50,19 +72,32 @@ export const DOCS_PATH = process.env.DOCS_PATH || './knowledge/docs';
 // VALIDATION
 // ─────────────────────────────────────────────
 export function validateConfig(): void {
-  const required: Record<string, string> = {
-    ANTHROPIC_API_KEY,
-    ADO_ORGANIZATION,
-    ADO_PROJECT,
-    ADO_PAT,
+  const provider = LLM_PROVIDER.toLowerCase();
+
+  // Provider-specific key check
+  const providerKeys: Record<string, string> = {
+    github:    GITHUB_TOKEN,
+    anthropic: ANTHROPIC_API_KEY,
+    azure:     AZURE_OPENAI_API_KEY,
   };
 
-  const missing = Object.entries(required)
-    .filter(([, v]) => !v)
-    .map(([k]) => k);
+  if (!providerKeys[provider]) {
+    console.warn(`⚠️  LLM_PROVIDER=${provider} but the required API key is missing.`);
+    if (provider === 'github')    console.warn('   Set GITHUB_TOKEN in your .env');
+    if (provider === 'anthropic') console.warn('   Set ANTHROPIC_API_KEY in your .env');
+    if (provider === 'azure')     console.warn('   Set AZURE_OPENAI_API_KEY in your .env');
+  } else {
+    console.log(`✅ LLM Provider: ${provider.toUpperCase()} (${
+      provider === 'github' ? GITHUB_MODEL
+      : provider === 'azure' ? AZURE_OPENAI_CHAT_DEPLOYMENT
+      : ANTHROPIC_MODEL
+    })`);
+  }
 
+  // ADO is always required
+  const adoRequired: Record<string, string> = { ADO_ORGANIZATION, ADO_PROJECT, ADO_PAT };
+  const missing = Object.entries(adoRequired).filter(([, v]) => !v).map(([k]) => k);
   if (missing.length > 0) {
-    console.warn(`⚠️  Missing environment variables: ${missing.join(', ')}`);
-    console.warn('   Copy .env.example to .env and fill in the values.');
+    console.warn(`⚠️  Missing ADO variables: ${missing.join(', ')}`);
   }
 }

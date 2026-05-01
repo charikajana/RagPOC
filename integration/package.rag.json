@@ -1,0 +1,15 @@
+{
+  "_comment": "ADD these scripts to your existing automation framework's package.json scripts section",
+  "scripts": {
+    "rag:start":   "cd %RAG_POC_PATH% && npm run dev",
+    "rag:ingest":  "ts-node rag/ingestMyFramework.ts",
+    "rag:generate":"ts-node rag/generateTest.ts",
+    "rag:search":  "ts-node rag/generateTest.ts --search"
+  },
+
+  "_comment2": "ADD these to your existing devDependencies if not already present",
+  "devDependencies": {
+    "ts-node":  "^10.9.2",
+    "dotenv":   "^16.4.5"
+  }
+}
